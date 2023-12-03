@@ -79,11 +79,12 @@ sub register ( $, $app, $config, @ ) {
                 : Mojo::Promise->resolve(1);
 
             $promise->then( sub {
+                my $code  = $tx->res->code;
+                my $error = $code >= 400 && $code < 600;
+
                 $span
-                    ->set_status( SPAN_STATUS_OK )
-                    ->set_attribute(
-                        'http.response.status_code' => $tx->res->code,
-                    )
+                    ->set_status( $error ? SPAN_STATUS_ERROR : SPAN_STATUS_OK )
+                    ->set_attribute( 'http.response.status_code' => $code )
                     ->end;
             })->wait;
 
