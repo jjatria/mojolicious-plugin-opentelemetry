@@ -43,7 +43,7 @@
          "requires" : {
             "Feature::Compat::Try" : "0",
             "Mojolicious" : "0",
-            "OpenTelemetry" : "0.010",
+            "OpenTelemetry" : "0.019",
             "Syntax::Keyword::Dynamically" : "0",
             "perl" : "5.013010"
          }
@@ -72,6 +72,11 @@
    "resources" : {
       "bugtracker" : {
          "web" : "https://gitlab.com/jjatria/mojolicious-plugin-opentelemetry/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jjatria/mojolicious-plugin-opentelemetry.git",
+         "web" : "https://github.com/jjatria/mojolicious-plugin-opentelemetry"
       }
    },
    "version" : "0.001",
