@@ -1,6 +1,6 @@
 requires 'Feature::Compat::Try';
 requires 'Mojolicious';
-requires 'OpenTelemetry', '0.010';
+requires 'OpenTelemetry', '0.019';
 requires 'Syntax::Keyword::Dynamically';
 
 on test => sub {
