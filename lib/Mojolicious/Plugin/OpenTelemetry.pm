@@ -14,7 +14,7 @@ sub register ( $, $app, $config, @ ) {
     $config->{tracer}{name} //= otel_config('SERVICE_NAME') // $app->moniker;
 
     $app->hook( around_action  => sub ( $next, $c, $action, $last, @ ) {
-        return unless $last;
+        return $next->() unless $last;
 
         my $tracer = otel_tracer_provider->tracer( %{ $config->{tracer} } );
 
