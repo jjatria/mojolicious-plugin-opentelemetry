@@ -80,7 +80,7 @@ L<propagator|OpenTelemetry/propagator>.
 The value of the C<tracer> parameter passed on registration will be used to
 obtain a L<tracer|OpenTelemetry::Trace::Tracer> via
 L<OpenTelemetry::Trace::TracerProvider/tracer>. Setting this is optional. If
-no value is set, the value wil be read from the
+no value is set, the value will be read from the
 L<"OTEL_SERVICE_NAME"|OpenTelemetry::SDK/OTEL_SERVICE_NAME> environment
 variable, or from the app's L<moniker|Mojolicious/moniker>, will be used as
 the default name, but all other values will be left unspecified.
