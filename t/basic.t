@@ -72,6 +72,11 @@ get '/error' => sub ( $c, @ ) {
     die 'oops';
 };
 
+under sub { 1 };
+get '/nested' => sub ( $c, @ ) {
+    $c->render( text => 'OK' );
+};
+
 my $tst = Test2::MojoX->new;
 
 subtest 'Static URL' => sub {
@@ -236,6 +241,12 @@ subtest 'Response codes' => sub {
         set_attribute    => [ 'http.response.status_code', 400 ],
         end              => [],
     ];
+};
+
+subtest 'Nested route' => sub {
+    $tst->get_ok('/nested')
+        ->content_is('OK')
+        ->status_is(200);
 };
 
 describe 'Host / port parsing' => sub {
