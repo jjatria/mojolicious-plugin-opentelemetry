@@ -1,6 +1,6 @@
 Revision history for Mojolicious-Plugin-OpenTelemetry
 
-{{$NEXT}}
+0.004     2024-11-22 13:22:54+00:00 Europe/London
 
     * Fixed an issue that would cause the code to hang with
       nested routes. This is a partial fix, in that the code
