@@ -78,6 +78,11 @@ get '/nested' => sub ( $c, @ ) {
     $c->render( text => 'OK' );
 };
 
+under '/top';
+get '/bottom' => sub ( $c, @ ) {
+    $c->render( text => 'OK' );
+};
+
 my $tst = Test2::MojoX->new;
 
 subtest 'Static URL' => sub {
@@ -244,22 +249,29 @@ subtest 'Response codes' => sub {
     ];
 };
 
-subtest 'Nested route' => sub {
-    $tst->get_ok('/nested');
+describe 'Nested route' => sub {
+    my $path;
 
-    like $span->{otel}, {
-        attributes => {
-            'http.request.method'      => 'GET',
-            'http.route'               => '/nested',
-            'url.path'                 => '/nested',
-        },
-        name => 'GET /nested',
+    case 'With sub'    => sub { $path = '/nested'     };
+    case 'With string' => sub { $path = '/top/bottom' };
+
+    it 'Works' => { flat => 1 } => sub {
+        $tst->get_ok($path);
+
+        like $span->{otel}, {
+            attributes => {
+                'http.request.method'      => 'GET',
+                'http.route'               => $path,
+                'url.path'                 => $path,
+            },
+            name => "GET $path",
+        };
+
+        span_calls [
+            set_attribute => [ 'http.response.status_code', 200 ],
+            end           => [],
+        ];
     };
-
-    span_calls [
-        set_attribute => [ 'http.response.status_code', 200 ],
-        end           => [],
-    ];
 };
 
 describe 'Host / port parsing' => sub {
