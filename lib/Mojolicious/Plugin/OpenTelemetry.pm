@@ -5,6 +5,7 @@ our $VERSION = '0.006';
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
+use Scalar::Util qw( blessed );
 use Feature::Compat::Try;
 use OpenTelemetry -all;
 use OpenTelemetry::Constants -span;
@@ -74,7 +75,7 @@ sub register ( $, $app, $config, @ ) {
             if ($want) { @result    = $next->() }
             else       { $result[0] = $next->() }
 
-            my $promise = $result[0]->can('then')
+            my $promise = $result[0] && blessed $result[0] && $result[0]->can('then')
                 ? $result[0]
                 : Mojo::Promise->resolve(1);
 

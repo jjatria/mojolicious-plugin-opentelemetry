@@ -72,6 +72,11 @@ get '/error' => sub ( $c, @ ) {
     die 'oops';
 };
 
+get '/return' => sub ( $c, @ ) {
+    $c->render( text => 'OK' );
+    return;
+};
+
 # FIXME: The parent code is NOT instrumented
 under sub ($c, @) { 'A parent route' };
 get '/nested' => sub ( $c, @ ) {
@@ -345,6 +350,37 @@ describe 'Host / port parsing' => sub {
             },
         };
     };
+};
+
+subtest 'Controller methods need not return anything' => sub {
+    $tst->get_ok('/return')
+        ->status_is(200);
+
+    is $span->{otel}, {
+        attributes => {
+            'client.address'           => '127.0.0.1',
+            'client.port'              => T,
+            'http.request.method'      => 'GET',
+            'http.route'               => '/return',
+            'network.protocol.version' => '1.1',
+            'server.address'           => '127.0.0.1',
+            'server.port'              => T,
+            'url.path'                 => '/return',
+            'url.scheme'               => 'http',
+            'user_agent.original'      => 'Mojolicious (Perl)',
+        },
+        kind => SPAN_KIND_SERVER,
+        name => 'GET /return',
+        parent => D, # FIXME: cannot use an object check on 5.32?
+      # parent => object {
+      #     prop isa => 'OpenTelemetry::Context';
+      # },
+    };
+
+    span_calls [
+        set_attribute    => [ 'http.response.status_code', 200 ],
+        end              => [],
+    ];
 };
 
 done_testing;
