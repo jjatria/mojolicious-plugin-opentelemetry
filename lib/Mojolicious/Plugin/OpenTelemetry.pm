@@ -80,7 +80,7 @@ sub register ( $, $app, $config, @ ) {
                 : Mojo::Promise->resolve(1);
 
             $promise->then( sub {
-                my $code  = $tx->res->code;
+                my $code  = $tx->res->code || 0;
 
                 # The status of server spans must be left unset if the
                 # response is a 4XX error
