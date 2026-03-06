@@ -74,9 +74,11 @@ sub register ( $, $app, $config, @ ) {
             if ($want) { @result    = $next->() }
             else       { $result[0] = $next->() }
 
-            my $promise = $result[0]->can('then')
-                ? $result[0]
-                : Mojo::Promise->resolve(1);
+            my $maybe = $result[0];
+            my $promise =
+                (defined $maybe && ref $maybe && $maybe->can('then'))
+                    ? $maybe
+                    : Mojo::Promise->resolve(1);
 
             $promise->then( sub {
                 my $code  = $tx->res->code;
