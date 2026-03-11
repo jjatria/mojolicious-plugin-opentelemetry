@@ -2,6 +2,8 @@ Revision history for Mojolicious-Plugin-OpenTelemetry
 
 {{$NEXT}}
 
+0.006     2026-03-11 17:33:44 GMT
+
     * Switch implementation to use `around_dispatch`, which
       means we can now instrument static responses and nested
       routes, as well as intermediate actions. This comes at
