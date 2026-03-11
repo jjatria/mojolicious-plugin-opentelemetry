@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::OpenTelemetry;
 # ABSTRACT: An OpenTelemetry integration for Mojolicious
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
