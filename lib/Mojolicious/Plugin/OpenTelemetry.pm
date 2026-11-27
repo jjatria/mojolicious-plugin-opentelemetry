@@ -6,12 +6,30 @@ our $VERSION = '0.007';
 use Mojo::Base 'Mojolicious::Plugin', -signatures;
 
 use Feature::Compat::Try;
+use List::Util 'none';
 use OpenTelemetry -all;
 use OpenTelemetry::Constants -span;
 use Syntax::Keyword::Dynamically;
 
+my sub get_headers( $headers, $want, $prefix ) {
+    return unless @$want;
+
+    my %attributes;
+    for my $name (@{$headers->names}) {
+        (my $key = $name) =~ tr/-/_/;
+        next if none {$key =~ $_} @$want;
+        push @{$attributes{ $prefix . '.' . lc $key } //= []},
+            @{$headers->every_header($name)};
+    }
+
+    %attributes;
+}
+
 sub register ( $, $app, $config, @ ) {
     $config->{tracer}{name} //= otel_config('SERVICE_NAME') // $app->moniker;
+
+    my @wanted_request_headers = map qr/^\Q$_\E$/i, map tr/-/_/r,
+        @{ delete $config->{request_headers}  // [] };
 
     # First, around_dispatch sets up the span and populates what it can
     $app->hook( around_dispatch  => sub ( $next, $c ) {
@@ -58,6 +76,11 @@ sub register ( $, $app, $config, @ ) {
                 $port  ? ( 'server.port'         => $port  ) : (),
                 $agent ? ( 'user_agent.original' => $agent ) : (),
                 $query ? ( 'url.query'           => $query ) : (),
+                get_headers(
+                    $headers,
+                    \@wanted_request_headers,
+                    'http.request.header'
+                ),
             },
         );
 
