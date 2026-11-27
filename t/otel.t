@@ -317,8 +317,11 @@ describe 'end()' => sub {
             });
         });
 
-        try { $t->ua->get('/error') }
-        catch ($e) {}
+        {
+            no warnings 'experimental::try';
+            try { $t->ua->get('/error') }
+            catch ($e) {}
+        }
 
         is $span->{end}, 1, 'span is marked finished';
     };
