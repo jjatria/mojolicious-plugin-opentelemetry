@@ -14,6 +14,7 @@ plugin OpenTelemetry => {
         name    => 'my_app', # defaults to OTEL_SERVICE_NAME or moniker
         version => '1.234',  # optional
     },
+    request_headers => [ 'X-Request-ID' ],
 };
 
 # Will generate a span named

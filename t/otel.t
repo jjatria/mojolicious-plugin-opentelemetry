@@ -51,7 +51,7 @@ OpenTelemetry->tracer_provider = Local::Provider->new;
 sub init_app {
     $span = undef;
     my $app = Mojolicious->new;
-    $app->plugin('Mojolicious::Plugin::OpenTelemetry');
+    $app->plugin('Mojolicious::Plugin::OpenTelemetry', { request_headers => [ 'X-Request-ID' ] });
     my $t = Test2::MojoX->new( $app );
     return $t;
 }
@@ -63,21 +63,22 @@ describe 'incoming HTTP request' => sub {
             $c->render( status => 200, json => {} )
         });
 
-        $t->get_ok('/rte')->status_is(200);
+        $t->get_ok('/rte' => { 'X-Request-ID' => '0192b1e4-7c8a-7000-8000-1a2b3c4d5e6f' })->status_is(200);
 
         like $span->{otel}, {
             attributes => {
-                'client.address'            => '127.0.0.1',
-                'client.port'               => T,
-                'http.request.method'       => 'GET',
-                'http.route'                => '/rte',
-                'http.response.status_code' => 200,
-                'network.protocol.version'  => '1.1',
-                'server.address'            => '127.0.0.1',
-                'server.port'               => T,
-                'url.path'                  => '/rte',
-                'url.scheme'                => 'http',
-                'user_agent.original'       => 'Mojolicious (Perl)',
+                'client.address'                   => '127.0.0.1',
+                'client.port'                      => T,
+                'http.request.method'              => 'GET',
+                'http.route'                       => '/rte',
+                'http.response.status_code'        => 200,
+                'network.protocol.version'         => '1.1',
+                'server.address'                   => '127.0.0.1',
+                'server.port'                      => T,
+                'url.path'                         => '/rte',
+                'url.scheme'                       => 'http',
+                'user_agent.original'              => 'Mojolicious (Perl)',
+                'http.request.header.x_request_id' => ['0192b1e4-7c8a-7000-8000-1a2b3c4d5e6f']
             },
             kind => SPAN_KIND_SERVER,
             name => 'GET /rte',
@@ -317,8 +318,11 @@ describe 'end()' => sub {
             });
         });
 
-        try { $t->ua->get('/error') }
-        catch ($e) {}
+        {
+            no warnings 'experimental::try';
+            try { $t->ua->get('/error') }
+            catch ($e) {}
+        }
 
         is $span->{end}, 1, 'span is marked finished';
     };

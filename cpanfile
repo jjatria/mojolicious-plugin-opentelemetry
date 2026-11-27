@@ -1,4 +1,5 @@
 requires 'Feature::Compat::Try';
+requires 'List::Util';
 requires 'Mojolicious';
 requires 'OpenTelemetry', '0.019';
 requires 'Syntax::Keyword::Dynamically';
